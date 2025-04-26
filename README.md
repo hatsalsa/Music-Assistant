@@ -10,6 +10,9 @@ Setup:
 mv example.yml config.yml
 ```
 
+> [!IMPORTANT]
+> Since it uses MediaInfo to parse Artist and Album name, your files must have the proper metadata. 
+
 Usage:
 ```bash
 python upload.py /path/to/your/album # e.g. /home/user/music/collection/eminem/Kamikaze
