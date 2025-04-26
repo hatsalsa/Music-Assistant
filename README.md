@@ -26,5 +26,6 @@ python upload.py /path/to/your/album # e.g. /home/user/music/collection/eminem/K
 - Extend the Deezer API usage.
 - Better file format handling when uploading. (only tested with FLACs).
 - Torrent clients support.
+- Docker version.
 
 
