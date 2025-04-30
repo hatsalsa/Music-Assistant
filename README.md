@@ -18,7 +18,7 @@ Usage:
 python upload.py /path/to/your/album # e.g. /home/user/music/collection/eminem/Kamikaze
 ```
 > [!NOTE]
-> It's a WIP tool so currently it only works with directories and UNIT3D trackers and expect a lot of BUGS.
+> It's a WIP tool, so currently it only works with directories and UNIT3D trackers and expect a lot of BUGS.
 
 ### To-do: 
 - Find a better way to handle the cover/banner image uploading.

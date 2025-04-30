@@ -1,12 +1,13 @@
 import os
 from pathlib import Path
-from os import write
 
 
 class Setup:
     def __init__(self, data):
         self.data = data
+
     async def torrent_name(self):
+        """Parses mediainfo of a file at index 0 to create the .torrent and search name"""
         sampling = ''
         artist = self.data[0]['Artist']
         album = self.data[0]['Album_Title']
@@ -23,13 +24,14 @@ class Setup:
                 sampling = '96kHz'
         torrent_name = f'{artist} {album} {track_format} {bits}bits {sampling}'
         search_name = f'{artist} {album}'
-        await self.create_tmp_dir(torrent_name)
-        await self.desc(torrent_name)
         return torrent_name, search_name, artist, album
-    async def desc(self, name):
+
+    async def desc(self, name, tracker_dir):
+        """ Create a description file based on the parsed mediainfo from the files"""
         track_sampling = ''
-        with open(f'{os.getcwd()}/tmp/{name}/DESCRIPTION.txt', 'a') as desc:
-            desc.write("[table]\n[tr]\n[th] Artists [/th]\n[th] Song Name [/th]\n[th] Track # [/th]\n[th] Format [/th]\n[th] Duration [/th]\n[th] Sampling [/th]\n[th] Bits [/th]\n[/tr]\n")
+        with open(f'{os.getcwd()}/tmp/{tracker_dir}/{name}/DESCRIPTION.txt', 'a') as desc:
+            desc.write(
+                "[table]\n[tr]\n[th] Artists [/th]\n[th] Song Name [/th]\n[th] Track # [/th]\n[th] Format [/th]\n[th] Duration [/th]\n[th] Sampling [/th]\n[th] Bits [/th]\n[/tr]\n")
         for track in self.data:
             track_artist = track['Artist']
             track_name = track['Track_Title']
@@ -46,10 +48,13 @@ class Setup:
                 case '96000':
                     track_sampling = '96kHz'
             track_bits = track['Bits']
-            with open(f'{os.getcwd()}/tmp/{name}/DESCRIPTION.txt', 'a') as desc:
-                desc.write(f'[tr][td]{track_artist}[/td]  [td]{track_name} [/td] [td]{track_number} [/td] [td]{track_format}[/td] [td] {track_duration} [/td] [td] {track_sampling} [/td] [td] {track_bits} [/td][/tr] \n')
-        with open(f'{os.getcwd()}/tmp/{name}/DESCRIPTION.txt', 'a') as desc:
+            with open(f'{os.getcwd()}/tmp/{tracker_dir}/{name}/DESCRIPTION.txt', 'a') as desc:
+                desc.write(
+                    f'[tr][td]{track_artist}[/td]  [td]{track_name} [/td] [td]{track_number} [/td] [td]{track_format}[/td] [td] {track_duration} [/td] [td] {track_sampling} [/td] [td] {track_bits} [/td][/tr] \n')
+        with open(f'{os.getcwd()}/tmp/{tracker_dir}/{name}/DESCRIPTION.txt', 'a') as desc:
             desc.write('[/table]')
+
     @staticmethod
-    async def create_tmp_dir(name):
-        Path(f'{Path.cwd()}/tmp/{name}').mkdir(parents=True, exist_ok=True)
+    async def create_tmp_dir(name, tracker_dir):
+        """Creates tmp directory """
+        Path(f'{Path.cwd()}/tmp/{tracker_dir}/{name}').mkdir(parents=True, exist_ok=True)

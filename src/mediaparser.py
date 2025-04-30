@@ -1,16 +1,19 @@
 import json
 import os
-from src.console import console as logger
+
 from pymediainfo import MediaInfo
 
 
 class MediaParser:
     def __init__(self, directory):
         self.directory = directory
+
     async def info_parser(self):
+        """Parses and formats mediainfo data from files."""
         track_data = []
-        excluded_extensions = {".jpeg", ".jpg", ".png", ".lrc", ".cue"}
-        files = [entry.name for entry in os.scandir(self.directory) if entry.is_file() and entry.name.lower().endswith(tuple(excluded_extensions)) is False]
+        excluded_extensions = {".jpeg", ".jpg", ".png", ".lrc", ".cue", ".txt"}
+        files = [entry.name for entry in os.scandir(self.directory) if
+                 entry.is_file() and entry.name.lower().endswith(tuple(excluded_extensions)) is False]
         for file in files:
             media_info = MediaInfo.parse(f'{self.directory}/{file}', output='JSON', full=False)
             info = json.loads(media_info)
@@ -29,7 +32,7 @@ class MediaParser:
                     remaining_seconds = seconds % 60
                     duration = f'{int(minutes)} minutes and {remaining_seconds:.0f} seconds'
                     bps = float(track.get('BitRate'))
-                    kbps = f'{int(bps)/ 1000:.0f} kb/s'
+                    kbps = f'{int(bps) / 1000:.0f} kb/s'
                     track_data[-1].update({
                         'Format': track.get('Format', {}),
                         'Duration': duration if duration else {},
@@ -41,4 +44,3 @@ class MediaParser:
                     })
         track_data.sort(key=lambda x: int(x['Track_Number']) if str(x['Track_Number']).isdigit() else float('inf'))
         return track_data
-
