@@ -28,4 +28,9 @@ python upload.py /path/to/your/album # e.g. /home/user/music/collection/eminem/K
 - Torrent clients support.
 - Docker version.
 
+### 📰 Contributing
+Pull requests are welcome! Whether it's fixing typos, improving documentation, or adding new features, your contributions help make Music Assistant better for everyone.
+
+### 🐞 Bug Reports
+Found a bug? Open an issue on GitHub with detailed steps to reproduce it. Quality bug reports are incredibly valuable for improving stability.
 
