@@ -1,23 +1,13 @@
-tracker_announce: "YOUR_ANNOUNCE_URL_GOES_HERE"
-torrents_url: "https://tracker.tld/torrents"
-#GET IT FROM YOUR TRACKER
-api_token: "YOUR_API_TOKEN"
-upload_api: "https://tracker.tld/api/torrents/upload"
-
-# Your XSRF_TOKEN GET IT FROM YOUR BROWSER COOKIES
-# NOTE: USED TO PATCH THE TORRENT WITH COVER/BANNER IMAGE
-# IF THE CREATED TORRENT DOESN'T HAVE AN IMAGE ITS PROBABLY DUE TO THIS BEING EXPIRED
-XSRF_TOKEN: ""
-
-# Your session token aka laravel_session / get it from your browser cookies
-# NOTE: THIS IS USED TO PATCH THE TORRENT WITH THE COVER/BANNER IMAGE
-# IF THE TORRENT DOESN'T HAVE A COVER/BANNER ITS PROBABLY DUE TO THIS BEING EXPIRED
-session_token: ""
-
-filter_api: "https://tracker.tld/api/torrents/filter"
-
-# get category and type id from the tracker
-category_id: "3"
-type_id: "7"
-
-source: "source flag from the tracker"
+tracker: ["LT"] # Must be always an array even if it's just one tracker.
+tracker_tokens:
+  LT:
+    # Your XSRF_TOKEN GET IT FROM YOUR BROWSER COOKIES
+    # NOTE: USED TO PATCH THE TORRENT WITH COVER/BANNER IMAGE
+    # IF THE CREATED TORRENT DOESN'T HAVE AN IMAGE ITS PROBABLY DUE TO THIS BEING EXPIRED
+    XSRF_TOKEN: ""
+    # Your session token aka laravel_session / get it from your browser cookies
+    # NOTE: THIS IS USED TO PATCH THE TORRENT WITH THE COVER/BANNER IMAGE
+    # IF THE TORRENT DOESN'T HAVE A COVER/BANNER ITS PROBABLY DUE TO THIS BEING EXPIRED
+    session_token: ""
+    api_token: ""
+    announce: "your_announce_url_goes_here"

@@ -1,0 +1,6 @@
+torrents_url: "https://lat-team.com/torrents"
+upload_api: "https://lat-team.com/api/torrents/upload"
+filter_api: "https://lat-team.com/api/torrents/filter"
+category_id: "3"
+type_id: "7"
+source: 'Lat-Team "Poder Latino"'
