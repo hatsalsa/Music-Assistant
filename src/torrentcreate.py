@@ -16,6 +16,21 @@ from src.console import console as logger
 from src.imageprocessing import ProcessImage
 
 
+def sanitize_path(path: str) -> str:
+    """Clean up path without destroying valid Windows separators."""
+    # Strip surrounding quotes and spaces
+    path = path.strip().strip('"').strip("'")
+
+    # Normalize path (convert relative .\ and / to absolute form)
+    path = os.path.normpath(path)
+
+    # Windows paths cannot contain <>:"|?* — but keep \ and /
+    invalid_chars = r'[<>:"|?*]'
+    path = re.sub(invalid_chars, "", path)
+
+    return path
+
+
 class Torrent:
     def __init__(self, path, config, name, artist, album):
         self.path = path
@@ -27,48 +42,74 @@ class Torrent:
     async def create(self, tracker):
         """Creates a .torrent file"""
         start_time = time.time()
-        torrent = makeTorrent(path=self.path, trackers=default.tracker_tokens[tracker].announce,
-                              creation_date=datetime.now(), piece_size=4194304, private=True, source=self.config.source,
-                              created_by='Music assistant', comment="Created with Music Assistant")
+
+        # ✅ Sanitize the directory path before using it
+        clean_path = sanitize_path(self.path)
+
+        torrent = makeTorrent(
+            path=clean_path,
+            trackers=default.tracker_tokens[tracker].announce,
+            creation_date=datetime.now(),
+            piece_size=4194304,
+            private=True,
+            source=self.config.source,
+            created_by="Music assistant",
+            comment="Created with Music Assistant",
+        )
+
         torrent.generate(callback=torf_cb, interval=5)
-        torrent.write(f'{os.getcwd()}/tmp/{tracker}/{self.name}/{self.name}.torrent', overwrite=True)
-        torrent.verify_filesize(self.path)
+        torrent.write(
+            f"{os.getcwd()}/tmp/{tracker}/{self.name}/{self.name}.torrent",
+            overwrite=True,
+        )
+        torrent.verify_filesize(clean_path)
+
         finish_time = time.time()
         logger.print(f"torrent created in {finish_time - start_time:.4f} seconds")
-        final_file_path = f'{os.getcwd()}/tmp/{tracker}/{self.name}/{self.name}.torrent'
+
+        final_file_path = f"{os.getcwd()}/tmp/{tracker}/{self.name}/{self.name}.torrent"
         return final_file_path
 
     async def upload_torrent(self, tracker):
         """POST action to tracker using API (Uploads .torrent, Creates/Updates tracker post)"""
-        torrent_bin = open(f'{os.getcwd()}/tmp/{tracker}/{self.name}/{self.name}.torrent', 'rb')
-        desc = open(f"{os.getcwd()}/tmp/{tracker}/{self.name}/DESCRIPTION.txt", 'r', encoding='utf-8').read()
+        torrent_bin = open(
+            f"{os.getcwd()}/tmp/{tracker}/{self.name}/{self.name}.torrent", "rb"
+        )
+        desc = open(
+            f"{os.getcwd()}/tmp/{tracker}/{self.name}/DESCRIPTION.txt",
+            "r",
+            encoding="utf-8",
+        ).read()
         files = {"torrent": torrent_bin}
         data = {
             "name": self.name,
             "description": desc,
-            'category_id': self.config.category_id,
-            'type_id': self.config.type_id,
-            'personal_release': True,
-            'internal': 0,
-            'featured': 0,
-            'free': 0,
-            'doubleup': 0,
-            'sticky': 0,
-            'anonymous': True,
+            "category_id": self.config.category_id,
+            "type_id": self.config.type_id,
+            "personal_release": True,
+            "internal": 0,
+            "featured": 0,
+            "free": 0,
+            "doubleup": 0,
+            "sticky": 0,
+            "anonymous": True,
         }
-        params = {
-            "api_token": default.tracker_tokens[tracker].api_token
-        }
+        params = {"api_token": default.tracker_tokens[tracker].api_token}
         headers = {
-            'User-Agent': f'Music Assistant/2.2 ({platform.system()} {platform.release()})'
+            "User-Agent": f"Music Assistant/2.2 ({platform.system()} {platform.release()})"
         }
         try:
             async with httpx.AsyncClient() as client:
-                response = await client.post(self.config.upload_api, files=files, data=data, headers=headers,
-                                             params=params)
+                response = await client.post(
+                    self.config.upload_api,
+                    files=files,
+                    data=data,
+                    headers=headers,
+                    params=params,
+                )
                 res_json = response.json()
                 if res_json.get("success") is True:
-                    match = re.search(r"/download/([^.]*)", res_json['data'])
+                    match = re.search(r"/download/([^.]*)", res_json["data"])
                     if match:
                         torrent_id = match.group(1)
                     torrent_bin.close()
@@ -83,25 +124,35 @@ class Torrent:
                     raise ValueError(res_json)
         except ValueError as e:
             tb_str = traceback.format_exc()
-            logger.print(f'There was an issue: {tb_str}')
+            logger.print(f"There was an issue: {tb_str}")
             logger.print(f"[bold red] API Response: {e} [/bold red]")
 
     async def patch_torrent(self, torrent_id, desc, tracker):
         """Automatically updates the cover/banner image of the published torrent."""
-        _image = await ProcessImage(self.path, name=self.name, artist=self.artist, album=self.album).img_path(tracker)
+        _image = await ProcessImage(
+            self.path, name=self.name, artist=self.artist, album=self.album
+        ).img_path(tracker)
         if not _image:
-            logger.print(f'[bold orange] Make sure theres a Cover.jpg|Cover.png|Cover.jpeg on the directory')
+            logger.print(
+                "[bold orange] Make sure theres a Cover.jpg|Cover.png|Cover.jpeg on the directory"
+            )
             return False
         else:
             _csrf_token = await self.parse_csrf_token(torrent_id, tracker)
             files = {
-                'torrent-cover': ('cover.jpg', open(f'{os.getcwd()}/tmp/{tracker}/{self.name}/cover.jpg', 'rb'),
-                                  'image/jpeg'),
-                'torrent-banner': ('cover.jpg', open(f'{os.getcwd()}/tmp/{tracker}/{self.name}/cover.jpg', 'rb'),
-                                   'image/jpeg')
+                "torrent-cover": (
+                    "cover.jpg",
+                    open(f"{os.getcwd()}/tmp/{tracker}/{self.name}/cover.jpg", "rb"),
+                    "image/jpeg",
+                ),
+                "torrent-banner": (
+                    "cover.jpg",
+                    open(f"{os.getcwd()}/tmp/{tracker}/{self.name}/cover.jpg", "rb"),
+                    "image/jpeg",
+                ),
             }
             headers = {
-                'User-Agent': f'Music Assistant/2.2 ({platform.system()} {platform.release()})'
+                "User-Agent": f"Music Assistant/2.2 ({platform.system()} {platform.release()})"
             }
             cookies = {
                 "laravel_cookie_consent": "1",
@@ -127,12 +178,19 @@ class Torrent:
             }
             try:
                 async with httpx.AsyncClient() as client:
-                    response = await client.post(f'{self.config.torrents_url}/{torrent_id}', files=files, data=data,
-                                                 headers=headers, cookies=cookies)
+                    response = await client.post(
+                        f"{self.config.torrents_url}/{torrent_id}",
+                        files=files,
+                        data=data,
+                        headers=headers,
+                        cookies=cookies,
+                    )
                     if response.status_code == 413:
-                        #TODO fallback to deezer api or local-default image
+                        # TODO fallback to deezer api or local-default image
                         # logger.print(f" Artists : {self.artist.lower()}, Album {self.album.lower()}")
-                        logger.print("Cover image size is too large. Cover not uploaded")
+                        logger.print(
+                            "Cover image size is too large. Cover not uploaded"
+                        )
                 return True
             except BaseException as e:
                 logger.print(f"[bold red] Critical Error {e} [/bold red]")
@@ -146,16 +204,20 @@ class Torrent:
             "laravel_session": default.tracker_tokens[tracker].session_token,
         }
         try:
-            response = requests.get(f'{self.config.torrents_url}/{torrent_id}', cookies=cookies)
-            parsed = BeautifulSoup(response.text, 'html.parser')
-            token = parsed.find("meta", attrs={"name": "csrf-token"})['content']
+            response = requests.get(
+                f"{self.config.torrents_url}/{torrent_id}", cookies=cookies
+            )
+            parsed = BeautifulSoup(response.text, "html.parser")
+            token = parsed.find("meta", attrs={"name": "csrf-token"})["content"]
             return token
         except BaseException as e:
-            logger.print(f'[bold red]Something went wrong {e}[/bold red]')
+            logger.print(f"[bold red]Something went wrong {e}[/bold red]")
             return None
 
 
 torf_start_time = time.time()
+
+
 def torf_cb(torrent, filepath, pieces_done, pieces_total):
     """Handles torrent creation timer"""
     global torf_start_time
@@ -188,4 +250,6 @@ def torf_cb(torrent, filepath, pieces_done, pieces_total):
         speed_str = "-- MB/s"
 
     # Display progress with percentage, speed, and ETA
-    cli_ui.info_progress(f"Hashing... {speed_str} | ETA: {eta}", int(percentage_done), 100)
+    cli_ui.info_progress(
+        f"Hashing... {speed_str} | ETA: {eta}", int(percentage_done), 100
+    )
