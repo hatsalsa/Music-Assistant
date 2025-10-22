@@ -11,6 +11,7 @@ class Setup:
         sampling = ''
         artist = self.data[0]['Artist']
         album = self.data[0]['Album_Title']
+        year = str(self.data[0].get('Year', '')).split('-')[0] or None
         track_format = self.data[0]['Format']
         bits = self.data[0]['Bits']
         match self.data[0]['Sampling']:
@@ -22,7 +23,7 @@ class Setup:
                 sampling = '24khZ'
             case '96000':
                 sampling = '96kHz'
-        torrent_name = f'{artist} {album} {track_format} {bits}bits {sampling}'
+        torrent_name = f'{artist} {album} {year} {track_format} {bits}bits {sampling}'
         search_name = f'{artist} {album}'
         return torrent_name, search_name, artist, album
 
