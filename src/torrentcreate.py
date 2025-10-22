@@ -86,13 +86,13 @@ class Torrent:
             "description": desc,
             "category_id": self.config.category_id,
             "type_id": self.config.type_id,
-            "personal_release": True,
+            "anonymous": 1 if default.tracker_tokens[tracker].anon else 0,
+            "personal_release": 1 if default.tracker_tokens[tracker].personal_release else 0,
             "internal": 0,
             "featured": 0,
             "free": 0,
             "doubleup": 0,
             "sticky": 0,
-            "anonymous": True,
         }
         params = {"api_token": default.tracker_tokens[tracker].api_token}
         headers = {
@@ -171,10 +171,9 @@ class Torrent:
                 "tvdb": "0",
                 "mal": "0",
                 "igdb": "0",
-                "anon": "0",
                 "internal": "0",
                 "description": desc,
-                "personal_release": "0",
+                "personal_release": "1" if default.tracker_tokens[tracker].personal_release else "0",
             }
             try:
                 async with httpx.AsyncClient() as client:

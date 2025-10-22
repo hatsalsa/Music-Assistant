@@ -11,3 +11,5 @@ tracker_tokens:
     session_token: ""
     api_token: ""
     announce: "your_announce_url_goes_here"
+    personal_release: False
+    anon: False
