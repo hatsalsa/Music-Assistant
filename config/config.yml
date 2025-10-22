@@ -1,0 +1,9 @@
+# This is the default configuration do not modify this file
+# Go to /config/trackers/tracker.yml
+torrents_url: "https://tracker.tld/torrents"
+upload_api: "https://tracker.tld/api/torrents/upload"
+filter_api: "https://tracker.tld/api/torrents/filter"
+# get category and type id from the tracker
+category_id: ""
+type_id: ""
+source: "source flag from the tracker"

@@ -1,7 +1,7 @@
 __pycache__
 *.torrent
 .DS_Store
-config.yml
+/config.yml
 .vscode/
 tmp/*
 tmp/*/*
@@ -11,6 +11,9 @@ tmp/*/*
 /.idea/*
 /tmp/
 /MISAMO/
+/Music
+/.idea
+/config/trackers/LB.yml
 testing.ipynb
 load_test.py
 

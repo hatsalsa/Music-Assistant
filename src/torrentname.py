@@ -29,7 +29,7 @@ class Setup:
     async def desc(self, name, tracker_dir):
         """ Create a description file based on the parsed mediainfo from the files"""
         track_sampling = ''
-        with open(f'{os.getcwd()}/tmp/{tracker_dir}/{name}/DESCRIPTION.txt', 'a') as desc:
+        with open(f'{os.getcwd()}/tmp/{tracker_dir}/{name}/DESCRIPTION.txt', 'a', encoding="utf-8") as desc:
             desc.write(
                 "[table]\n[tr]\n[th] Artists [/th]\n[th] Song Name [/th]\n[th] Track # [/th]\n[th] Format [/th]\n[th] Duration [/th]\n[th] Sampling [/th]\n[th] Bits [/th]\n[/tr]\n")
         for track in self.data:
@@ -48,10 +48,10 @@ class Setup:
                 case '96000':
                     track_sampling = '96kHz'
             track_bits = track['Bits']
-            with open(f'{os.getcwd()}/tmp/{tracker_dir}/{name}/DESCRIPTION.txt', 'a') as desc:
+            with open(f'{os.getcwd()}/tmp/{tracker_dir}/{name}/DESCRIPTION.txt', 'a', encoding="utf-8") as desc:
                 desc.write(
                     f'[tr][td]{track_artist}[/td]  [td]{track_name} [/td] [td]{track_number} [/td] [td]{track_format}[/td] [td] {track_duration} [/td] [td] {track_sampling} [/td] [td] {track_bits} [/td][/tr] \n')
-        with open(f'{os.getcwd()}/tmp/{tracker_dir}/{name}/DESCRIPTION.txt', 'a') as desc:
+        with open(f'{os.getcwd()}/tmp/{tracker_dir}/{name}/DESCRIPTION.txt', 'a', encoding="utf-8") as desc:
             desc.write('[/table]')
 
     @staticmethod
