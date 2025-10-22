@@ -34,7 +34,6 @@ class MediaParser:
 
             for track in info.get("media", {}).get("track", []):
                 if track["@type"] == "General":
-                    print(track.get('Recorded_Date',''))
                     track_data.append(
                         {
                             "Artist": track.get("Performer", ""),
