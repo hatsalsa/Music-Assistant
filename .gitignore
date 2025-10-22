@@ -16,6 +16,7 @@ tmp/*/*
 /config/trackers/LB.yml
 testing.ipynb
 load_test.py
+emailtest.py
 
 # Created by https://www.toptal.com/developers/gitignore/api/jupyternotebooks,python,pycharm
 # Edit at https://www.toptal.com/developers/gitignore?templates=jupyternotebooks,python,pycharm
