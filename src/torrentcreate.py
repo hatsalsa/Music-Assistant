@@ -87,7 +87,9 @@ class Torrent:
             "category_id": self.config.category_id,
             "type_id": self.config.type_id,
             "anonymous": 1 if default.tracker_tokens[tracker].anon else 0,
-            "personal_release": 1 if default.tracker_tokens[tracker].personal_release else 0,
+            "personal_release": 1
+            if default.tracker_tokens[tracker].personal_release
+            else 0,
             "internal": 0,
             "featured": 0,
             "free": 0,
@@ -173,7 +175,9 @@ class Torrent:
                 "igdb": "0",
                 "internal": "0",
                 "description": desc,
-                "personal_release": "1" if default.tracker_tokens[tracker].personal_release else "0",
+                "personal_release": "1"
+                if default.tracker_tokens[tracker].personal_release
+                else "0",
             }
             try:
                 async with httpx.AsyncClient() as client:
